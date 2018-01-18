@@ -471,6 +471,8 @@ AC_CHECK_HEADERS(lpc10.h, ,
     AC_CHECK_LIB(lpc10, create_lpc10_encoder_state, LPC10_LIBS="$LPC10_LIBS -llpc10", found_liblpc10=no)
 if test "$found_liblpc10" = yes; then
     AC_DEFINE(EXTERNAL_LPC10, 1, [Define if you are using an external LPC10 library])
+else
+    LIBLPC10_LIBADD=../lpc10/liblpc10.la
 fi
 AM_CONDITIONAL(EXTERNAL_LPC10, test x$found_liblpc10 = xyes)
 AC_SUBST(LIBLPC10_LIBADD)
@@ -668,7 +670,7 @@ AC_SUBST(PLAYRECLINKS)
 AM_CONDITIONAL(STATIC_LIBSOX_ONLY, test "$enable_shared" = "no" -a "$enable_static" = "yes")
 
 dnl Generate output files.
-AC_CONFIG_FILES(Makefile src/Makefile libgsm/Makefile msvc9/Makefile msvc10/Makefile sox.pc)
+AC_CONFIG_FILES(Makefile src/Makefile libgsm/Makefile lpc10/Makefile msvc9/Makefile msvc10/Makefile sox.pc)
 AC_OUTPUT
 
 if test "$using_gsm" != "no"; then
