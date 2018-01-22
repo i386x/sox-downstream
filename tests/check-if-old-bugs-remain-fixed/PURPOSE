@@ -1,0 +1,10 @@
+PURPOSE of /tests/check-if-old-bugs-remain-fixed
+Description: Check if fixed bugs remain fixed in the next upstream release
+Author: Jiri Kucera <jkucera@redhat.com>
+
+This test:
+- checks if these CVE's remain fixed in the next upstream release:
+  * CVE-2017-15370
+  * CVE-2017-15371
+  * CVE-2017-15372
+  * CVE-2017-15642
