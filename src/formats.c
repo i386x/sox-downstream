@@ -1161,6 +1161,9 @@ enum {
 static sox_bool plugins_initted = sox_false;
 
 #ifdef HAVE_LIBLTDL /* Plugin format handlers */
+  #ifdef SOX_ALLOW_SOX_PLUGINS_OVERRIDING
+    #define SOX_PLUGINS_NAME "SOX_PLUGINS"
+  #endif
   #define MAX_DYNAMIC_FORMATS 42
   #define MAX_FORMATS (NSTATIC_FORMATS + MAX_DYNAMIC_FORMATS)
   #define MAX_FORMATS_1 (MAX_FORMATS + 1)
@@ -1218,6 +1221,20 @@ sox_get_format_fns(void)
     }
     return 0;
   }
+
+  /* Allow to specify SoX plugin directory via environment */
+  static const char *get_sox_plugins_dir(void)
+  {
+  #ifdef SOX_ALLOW_SOX_PLUGINS_OVERRIDING
+    const char *sox_plugins_dir = getenv(SOX_PLUGINS_NAME);
+
+    if (!sox_plugins_dir)
+  #endif
+      return PKGLIBDIR;
+  #ifdef SOX_ALLOW_SOX_PLUGINS_OVERRIDING
+    return sox_plugins_dir;
+  #endif
+  }
 #endif
 
 int sox_format_init(void) /* Find & load format handlers.  */
@@ -1233,7 +1250,7 @@ int sox_format_init(void) /* Find & load format handlers.  */
       lsx_fail("lt_dlinit failed with %d error(s): %s", error, lt_dlerror());
       return SOX_EOF;
     }
-    lt_dlforeachfile(PKGLIBDIR, init_format, NULL);
+    lt_dlforeachfile(get_sox_plugins_dir(), init_format, NULL);
   }
 #endif
   return SOX_SUCCESS;

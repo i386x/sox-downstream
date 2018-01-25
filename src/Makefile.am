@@ -34,15 +34,17 @@ endif
 # SoX - the application #
 #########################
 
-bin_PROGRAMS = sox
+bin_PROGRAMS = sox soxdbg
 EXTRA_PROGRAMS = example0 example1 example2 example3 example4 example5 example6 sox_sample_test
-lib_LTLIBRARIES = libsox.la
+lib_LTLIBRARIES = libsox.la libsoxdbg.la
 include_HEADERS = sox.h
 sox_SOURCES = sox.c
 if HAVE_WIN32_GLOB
 sox_SOURCES += win32-glob.c win32-glob.h
 endif
+soxdbg_SOURCES = ${sox_SOURCES}
 sox_LDADD = libsox.la
+soxdbg_LDADD = libsoxdbg.la
 example0_SOURCES = example0.c
 example1_SOURCES = example1.c
 example2_SOURCES = example2.c
@@ -132,6 +134,11 @@ include optional-fmts.am
 
 
 
+libsoxdbg_la_SOURCES = ${libsox_la_SOURCES}
+libsoxdbg_la_LIBADD = ${libsox_la_LIBADD}
+libsoxdbg_la_CPPFLAGS = -DSOX_ALLOW_SOX_PLUGINS_OVERRIDING=1 ${AM_CPPFLAGS}
+libsoxdbg_la_CFLAGS = ${libsox_la_CFLAGS}
+libsoxdbg_la_LDFLAGS = ${libsox_la_LDFLAGS}
 # example programs will need same link options as sox does.
 example0_LDADD = ${sox_LDADD}
 example1_LDADD = ${sox_LDADD}
@@ -145,31 +152,36 @@ EXTRA_DIST = monkey.wav optional-fmts.am \
 	     CMakeLists.txt soxconfig.h.cmake \
 	     tests.sh testall.sh tests.bat testall.bat test-comments
 
-all: sox$(EXEEXT) play$(EXEEXT) rec$(EXEEXT) soxi$(EXEEXT) sox_sample_test$(EXEEXT) example0$(EXEEXT) example1$(EXEEXT) example2$(EXEEXT) example3$(EXEEXT) example4$(EXEEXT) example5$(EXEEXT) example6$(EXEEXT)
+all: sox$(EXEEXT) soxdbg$(EXEEXT) play$(EXEEXT) playdbg$(EXEEXT) rec$(EXEEXT) recdbg$(EXEEXT) soxi$(EXEEXT) soxidbg$(EXEEXT) sox_sample_test$(EXEEXT) example0$(EXEEXT) example1$(EXEEXT) example2$(EXEEXT) example3$(EXEEXT) example4$(EXEEXT) example5$(EXEEXT) example6$(EXEEXT)
 
 play$(EXEEXT) rec$(EXEEXT) soxi$(EXEEXT): sox$(EXEEXT)
 	if test "$(PLAYRECLINKS)" = "yes"; then	\
 		test -f sox$(EXEEXT) && ( $(RM) $@ && $(LN_S) sox$(EXEEXT) $@ ) || $(LN_S) sox $@; \
 	fi
 
+playdbg$(EXEEXT) recdbg$(EXEEXT) soxidbg$(EXEEXT): soxdbg$(EXEEXT)
+	if test "$(PLAYRECLINKS)" = "yes"; then \
+		test -f soxdbg$(EXEEXT) && ( $(RM) $@ && $(LN_S) soxdbg$(EXEEXT) $@ ) || $(LN_S) soxdbg $@; \
+	fi
+
 install-exec-hook:
 	if test "$(PLAYRECLINKS)" = "yes"; then	\
-		cd $(DESTDIR)$(bindir); $(RM) play$(EXEEXT) rec$(EXEEXT); $(LN_S) sox$(EXEEXT) play$(EXEEXT); $(LN_S) sox$(EXEEXT) rec$(EXEEXT); \
+		cd $(DESTDIR)$(bindir); $(RM) play$(EXEEXT) rec$(EXEEXT) playdbg$(EXEEXT) recdbg$(EXEEXT); $(LN_S) sox$(EXEEXT) play$(EXEEXT); $(LN_S) sox$(EXEEXT) rec$(EXEEXT); $(LN_S) soxdbg$(EXEEXT) playdbg$(EXEEXT); $(LN_S) soxdbg$(EXEEXT) recdbg$(EXEEXT); \
 	fi
 	if test "$(SYMLINKS)" = "yes"; then	\
-		cd $(DESTDIR)$(bindir); $(RM) soxi$(EXEEXT); $(LN_S) sox$(EXEEXT) soxi$(EXEEXT); \
+		cd $(DESTDIR)$(bindir); $(RM) soxi$(EXEEXT) soxidbg$(EXEEXT); $(LN_S) sox$(EXEEXT) soxi$(EXEEXT); $(LN_S) soxdbg$(EXEEXT) soxidbg$(EXEEXT); \
 	fi
 
 uninstall-hook:
 	if test "$(PLAYRECLINKS)" = "yes"; then	\
-		cd $(DESTDIR)$(bindir); $(RM) play$(EXTEXT) rec$(EXEEXT); \
+		cd $(DESTDIR)$(bindir); $(RM) play$(EXTEXT) rec$(EXEEXT) playdbg$(EXTEXT) recdbg$(EXEEXT); \
 	fi
 	if test "$(SYMLINKS)" = "yes"; then	\
-		cd $(DESTDIR)$(bindir); $(RM) soxi$(EXEEXT); \
+		cd $(DESTDIR)$(bindir); $(RM) soxi$(EXEEXT) soxidbg$(EXEEXT); \
 	fi
 
 clean-local:
-	$(RM) play$(EXEEXT) rec$(EXEEXT) soxi$(EXEEXT)
+	$(RM) play$(EXEEXT) rec$(EXEEXT) soxi$(EXEEXT) playdbg$(EXEEXT) recdbg$(EXEEXT) soxidbg$(EXEEXT)
 	$(RM) sox_sample_test$(EXEEXT)
 	$(RM) example0$(EXEEXT) example1$(EXEEXT) example2$(EXEEXT) example3$(EXEEXT) example4$(EXEEXT) example5$(EXEEXT) example6$(EXEEXT)
 

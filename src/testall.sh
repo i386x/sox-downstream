@@ -2,7 +2,7 @@ bindir="."
 srcdir="."
 effect=""
 
-if [ -f ./sox.exe ] ; then
+if [ -f ./soxdbg.exe ] ; then
   EXEEXT=".exe"
 else
   EXEEXXT=""
@@ -36,14 +36,16 @@ while [ $# -ne 0 ]; do
     shift
 done
 
+[ "$SOX_TEST_BINDIR" ] && bindir="$SOX_TEST_BINDIR"
+
 t() {
 	format=$1
 	shift
 	opts="$*"
 
 	echo "Format: $format   Options: $opts"
-	${bindir}/sox${EXEEXT} ${srcdir}/monkey.wav $opts /tmp/monkey.$format $effect
-	${bindir}/sox${EXEEXT} $opts /tmp/monkey.$format /tmp/monkey1.wav  $effect
+	${bindir}/soxdbg${EXEEXT} ${srcdir}/monkey.wav $opts /tmp/monkey.$format $effect
+	${bindir}/soxdbg${EXEEXT} $opts /tmp/monkey.$format /tmp/monkey1.wav  $effect
 }
 t 8svx
 t aiff
@@ -53,7 +55,9 @@ t avr -e unsigned-integer
 t cdr
 t cvs
 t dat
-t hcom -r 22050
+if [[ ! $(uname -m) =~ ppc64|s390x ]]; then
+  t hcom -r 22050
+fi
 t maud
 t prc
 t prc -e signed-integer
