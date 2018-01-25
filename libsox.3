@@ -75,8 +75,13 @@ useful for any sound application.
 \fBsox_format_init\fR function performs some required initialization
 related to all file format handlers.  If compiled with dynamic
 library support then this will detect and initialize all external
-libraries.  This should be called before any other file operations
-are performed.
+libraries.  As default, SoX loads external libraries from its compile-time
+given directory.  This behavior can be changed by setting the SOX_PLUGINS
+environment variable that overrides the default path to external libraries
+directory.  sox_format_init should be called before any other file operations
+are performed.  See also \fIPlugins\fR subsection under the \fIDESCRIPTION\fR
+section in
+.BR sox (1).
 .P
 \fBsox_format_quit\fR function performs some required cleanup
 related to all file format handlers.
@@ -360,6 +365,10 @@ details; basically, you use it as:
 .EX
    libtool \-\-mode=link gcc \-o prog /path/to/libsox.la
 .EE
+.SH ENVIRONMENT
+.TP 20
+SOX_PLUGINS
+Overrides the default path to the external libraries directory.
 .SH BUGS
 This manual page is both incomplete and out of date.
 .SH SEE ALSO

@@ -50,6 +50,9 @@ OPTIONS
 
        -a     Show file comments (annotations) if available.
 
+ENVIRONMENT
+       SOX_PLUGINS         Overrides default path to directory with plugins.
+
 BUGS
        Please report any bugs found in this version of SoX to the mailing list
        (sox-users@lists.sourceforge.net).

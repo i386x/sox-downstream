@@ -620,6 +620,17 @@ Another option to stop processing early is to use an effect that
 has a time period or sample count to determine the stopping
 point. The trim effect is an example of this.  Once all
 effects chains have stopped then SoX will also stop.
+.SS Plugins
+When SoX recognizes the format of its input or output file, it looks for the
+corresponding plugin. During its start, SoX loads all its plugins from the
+specified directory. The default path to this directory is given at the compile
+time as `${libdir}/sox', but it can be overridden by the
+.B SOX_PLUGINS
+environment variable. A plugin is in fact a shared library object its name has
+a format `libsox_fmt_<format-name>.so', where <format-name> is a name of one of
+the supported formats, so for FLAC SoX use `libsox_fmt_flac.so' etc. For the
+list of supported formats, see
+.BR soxformat (7).
 .SH FILENAMES
 Filenames can be simple file names, absolute or relative path names,
 or URLs (input files only).  Note that URL support requires that
@@ -4180,6 +4191,19 @@ See also
 for a volume-changing effect with different capabilities, and
 .B compand
 for a dynamic-range compression/expansion/limiting effect.
+.SH ENVIRONMENT
+.TP 20
+AUDIODEV
+Overrides the default audio device.
+.TP 20
+AUDIODRIVER
+Overrides the default audio driver selected by SoX.
+.TP 20
+SOX_OPTS
+Provides alternative default values for SoX's global options.
+.TP 20
+SOX_PLUGINS
+Overrides default path to directory with plugins.
 .SH DIAGNOSTICS
 Exit status is 0 for no error, 1 if there is a problem with the
 command-line parameters, or 2 if an error occurs during file processing.

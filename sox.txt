@@ -481,6 +481,17 @@ DESCRIPTION
        effect is an example of this.  Once all  effects  chains  have  stopped
        then SoX will also stop.
 
+   Plugins
+       When  SoX  recognizes  the format of its input or output file, it looks
+       for the corresponding plugin. During  its  start,  SoX  loads  all  its
+       plugins  from  the  specified  directory.  The  default  path  to  this
+       directory is given at the compile time as `${libdir}/sox', but  it  can
+       be  overridden  by the SOX_PLUGINS environment variable. A plugin is in
+       fact a shared library object its name has a format `libsox_fmt_<format-
+       name>.so',  where  <format-name>  is  a  name  of  one of the supported
+       formats, so for FLAC SoX use `libsox_fmt_flac.so' etc. For the list  of
+       supported formats, see soxformat(7).
+
 FILENAMES
        Filenames can be simple file names, absolute or relative path names, or
        URLs (input files only).  Note that URL support requires  that  wget(1)
@@ -2009,8 +2020,6 @@ EFFECTS
                      -l      low      80%     100     playback on old
                                                       hardware
                      -m    medium     95%     100     audio playback
-
-
                      -h     high      95%     125     16-bit mastering
                                                       (use with dither)
                      -v   very high   95%     175     24-bit mastering
@@ -2166,7 +2175,6 @@ EFFECTS
 
                       Letter   Volume number        Notes
                         p      power adjust in dB   0 = no change
-
                         i      power adjust in dB   As `p', but invert
                                                     the audio
                         v      voltage multiplier   1 = no change, 0.5
@@ -2727,6 +2735,7 @@ EFFECTS
 
 
 
+
                RMS amplitude       √(¹/nΣxk²)            The level of a D.C.
                                                          signal  that  would
                                                          have the same power
@@ -2797,6 +2806,7 @@ EFFECTS
                           Bit-depth      16/16     16/16     16/16
                           Num samples    7.72M
                           Length s     174.973
+
                           Scale max   1.000000
                           Window s       0.050
 
@@ -3202,8 +3212,18 @@ EFFECTS
               bilities,  and  compand  for  a dynamic-range compression/expan‐
               sion/limiting effect.
 
+ENVIRONMENT
+       AUDIODEV            Overrides the default audio device.
+
+       AUDIODRIVER         Overrides the default audio driver selected by SoX.
+
+       SOX_OPTS            Provides  alternative  default  values  for   SoX's
+                           global options.
+
+       SOX_PLUGINS         Overrides default path to directory with plugins.
+
 DIAGNOSTICS
-       Exit status is 0 for no error, 1 if there is a problem  with  the  com‐
+       Exit  status  is  0 for no error, 1 if there is a problem with the com‐
        mand-line parameters, or 2 if an error occurs during file processing.
 
 BUGS
@@ -3239,13 +3259,13 @@ LICENSE
        Copyright 1991 Lance Norskog and Sundry Contributors.
 
        This program is free software; you can redistribute it and/or modify it
-       under the terms of the GNU General Public License as published  by  the
-       Free  Software  Foundation;  either  version 2, or (at your option) any
+       under  the  terms of the GNU General Public License as published by the
+       Free Software Foundation; either version 2, or  (at  your  option)  any
        later version.
 
-       This program is distributed in the hope that it  will  be  useful,  but
-       WITHOUT  ANY  WARRANTY;  without  even  the  implied  warranty  of MER‐
-       CHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  General
+       This  program  is  distributed  in the hope that it will be useful, but
+       WITHOUT ANY  WARRANTY;  without  even  the  implied  warranty  of  MER‐
+       CHANTABILITY  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
        Public License for more details.
 
 AUTHORS
