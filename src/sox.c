@@ -3835,7 +3835,7 @@ static void output_message(
   soxdbg_fleave();
 }
 
-static sox_bool cmp_comment_text(char const * c1, char const * c2)
+static sox_bool cmp_comment_text(char const *c1, char const *c2)
 {
   sox_bool r;
 
