@@ -26,6 +26,9 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#define SOXDBG_ALLOWED 1
+#include "soxdbg.h"
+
 /* FIXME: eliminate these 2 functions */
 
 static void put32_be(unsigned char **p, int32_t val)
@@ -424,12 +427,15 @@ static void compress(sox_format_t * ft, unsigned char **df, int32_t *dl)
 
 /* End of hcom utility routines */
 
-static int stopwrite(sox_format_t * ft)
+static int stopwrite(sox_format_t *ft)
 {
-  priv_t *p = (priv_t *) ft->priv;
+  priv_t *p = (priv_t *)ft->priv;
   unsigned char *compressed_data = p->data;
   size_t compressed_len = p->pos;
   int rc = SOX_SUCCESS;
+
+  soxdbg_fenter();
+  soxdbg_show_format_t(*ft);
 
   /* Compress it all at once */
   if (compressed_len)
@@ -437,17 +443,23 @@ static int stopwrite(sox_format_t * ft)
   free(p->data);
 
   /* Write the header */
-  lsx_writebuf(ft, "\000\001A", (size_t) 3); /* Dummy file name "A" */
-  lsx_padbytes(ft, (size_t) 65-3);
+  /* Dummy file name "A" */
+  lsx_writebuf(ft, "\000\001A", (size_t)3);
+  lsx_padbytes(ft, (size_t)65 - 3);
   lsx_writes(ft, "FSSD");
-  lsx_padbytes(ft, (size_t) 83-69);
-  lsx_writedw(ft, (unsigned) compressed_len); /* compressed_data size */
-  lsx_writedw(ft, 0); /* rsrc size */
-  lsx_padbytes(ft, (size_t) 128 - 91);
+  lsx_padbytes(ft, (size_t)83 - 69);
+  /* compressed_data size */
+  lsx_writedw(ft, (unsigned)compressed_len);
+  /* rsrc size */
+  lsx_writedw(ft, 0);
+  lsx_padbytes(ft, (size_t)128 - 91);
   if (lsx_error(ft)) {
     lsx_fail_errno(ft, errno, "write error in HCOM header");
     rc = SOX_EOF;
-  } else if (lsx_writebuf(ft, compressed_data, compressed_len) != compressed_len) {
+  }
+  else if (
+    lsx_writebuf(ft, compressed_data, compressed_len) != compressed_len
+  ) {
     /* Write the compressed_data fork */
     lsx_fail_errno(ft, errno, "can't write compressed HCOM data");
     rc = SOX_EOF;
@@ -458,6 +470,7 @@ static int stopwrite(sox_format_t * ft)
     /* Pad the compressed_data fork to a multiple of 128 bytes */
     lsx_padbytes(ft, 128u - (compressed_len % 128));
 
+  soxdbg_fleave();
   return rc;
 }
 
