@@ -230,7 +230,11 @@
    soxdbg_fprintf( \
      stderr, "- signal.length: %" PRIu64 "\n", (x).signal.length \
    ); \
-   soxdbg_fprintf(stderr, "- signal.mult: %f\n", *((x).signal.mult)); \
+   soxdbg_fprintf(stderr, "- signal.mult: "); \
+   if ((x).signal.mult == NULL) \
+     soxdbg_fprintf(stderr, "unused\n"); \
+   else \
+     soxdbg_fprintf(stderr, "%f\n", *((x).signal.mult)); \
    soxdbg_fprintf(stderr, "- encoding.encoding: "); \
    soxdbg_show_encoding((x).encoding.encoding); \
    soxdbg_fprintf(stderr, "(%d)\n", (x).encoding.encoding); \
