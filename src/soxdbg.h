@@ -170,7 +170,7 @@
      while (1) { \
        if (formats[i] == 0) \
          break; \
-       fprintf("  [WFMT #%d]: ", j); \
+       fprintf(stderr, "  [WFMT #%d]: ", j); \
        j++; \
        soxdbg_show_encoding(formats[i]); \
        i++; \
