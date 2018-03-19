@@ -37,6 +37,9 @@
 #include <sys/types.h>
 #include <time.h>
 
+#define SOXDBG_ALLOWED 1
+#include "soxdbg.h"
+
 #if defined(HAVE_WIN32_GLOB_H)
 #  include "win32-glob.h"
 #  define HAVE_GLOB_H 1
