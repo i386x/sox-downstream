@@ -121,7 +121,7 @@
      fprintf(stderr, "%s", names[e]); \
    } while (0)
 #  define soxdbg_show_io_type(t) do { \
-     static const char *names = { \
+     static const char *names[] = { \
        "file", "pipe", "url" \
      }; \
  \
@@ -133,7 +133,13 @@
      if (p == NULL) \
        break; \
      while (*p++) \
-       fprintf(stderr, "  [COMMENT]: \"%s\"\n", *p); \
+       fprintf( \
+         stderr, \
+         "  [COMMENT]: %s%s%s\n", \
+         *p ? "\"" : "", \
+         *p ? *p : "NULL", \
+         *p ? "\"" : "" \
+       ); \
    } while (0)
 #  define soxdbg_show_loops(l, n) do { \
      sox_loopinfo_t *loops = (l); \
