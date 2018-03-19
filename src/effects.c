@@ -23,6 +23,9 @@
   #include <strings.h>
 #endif
 
+#define SOXDBG_ALLOWED 1
+#include "soxdbg.h"
+
 #define DEBUG_EFFECTS_CHAIN 0
 
 /* Default effect handler functions for do-nothing situations: */
@@ -400,60 +403,92 @@ static int drain_effect(sox_effects_chain_t * chain, size_t n)
 }
 
 /* Flow data through the effects chain until an effect or callback gives EOF */
-int sox_flow_effects(sox_effects_chain_t * chain, int (* callback)(sox_bool all_done, void * client_data), void * client_data)
+int sox_flow_effects(
+  sox_effects_chain_t *chain,
+  int (* callback)(sox_bool all_done, void *client_data),
+  void *client_data
+)
 {
   int flow_status = SOX_SUCCESS;
-  size_t e, source_e = 0;               /* effect indices */
+  /* effect indices */
+  size_t e, source_e = 0;
   size_t max_flows = 0;
   sox_bool draining = sox_true;
 
+  soxdbg_fenter();
   for (e = 0; e < chain->length; ++e) {
     sox_effect_t *effp = chain->effects[e];
-    effp->obuf =
-        lsx_realloc(effp->obuf, sox_globals.bufsiz * sizeof(*effp->obuf));
-      /* Memory will be freed by sox_delete_effect() later. */
-      /* Possibly there was already a buffer, if this is a used effect;
-         it may still contain samples in that case. */
-      if (effp->oend > sox_globals.bufsiz) {
-        lsx_warn("buffer size insufficient; buffered samples were dropped");
-        /* can only happen if bufsize has been reduced since the last run */
-        effp->obeg = effp->oend = 0;
-      }
+
+    effp->obuf = lsx_realloc(
+      effp->obuf, sox_globals.bufsiz * sizeof(*effp->obuf)
+    );
+    /* Memory will be freed by sox_delete_effect() later.
+     * Possibly there was already a buffer, if this is a used effect;
+     * it may still contain samples in that case.
+     */
+    if (effp->oend > sox_globals.bufsiz) {
+      lsx_warn("buffer size insufficient; buffered samples were dropped");
+      /* can only happen if bufsize has been reduced since the last run */
+      effp->obeg = effp->oend = 0;
+    }
     max_flows = max(max_flows, effp->flows);
   }
-  if (max_flows > 1) /* might need interleave buffer */
+  if (max_flows > 1)
+    /* might need interleave buffer */
     chain->il_buf = lsx_malloc(sox_globals.bufsiz * sizeof(sox_sample_t));
   else
     chain->il_buf = NULL;
 
   /* Go through the effects, and if there are samples in one of the
-     buffers, deinterleave it (if necessary).  */
+   * buffers, deinterleave it (if necessary).
+   */
   for (e = 0; e + 1 < chain->length; e++) {
     sox_effect_t *effp = chain->effects[e];
-    if (effp->oend > effp->obeg && chain->effects[e+1]->flows > 1) {
-      sox_sample_t *sw = chain->il_buf; chain->il_buf = effp->obuf; effp->obuf = sw;
-      deinterleave(chain->effects[e+1]->flows, effp->oend - effp->obeg,
-          chain->il_buf, effp->obuf, sox_globals.bufsiz, effp->obeg);
+
+    if (effp->oend > effp->obeg && chain->effects[e + 1]->flows > 1) {
+      sox_sample_t *sw = chain->il_buf;
+
+      chain->il_buf = effp->obuf;
+      effp->obuf = sw;
+      deinterleave(
+        chain->effects[e + 1]->flows,
+        effp->oend - effp->obeg,
+        chain->il_buf,
+        effp->obuf,
+        sox_globals.bufsiz,
+        effp->obeg
+      );
     }
   }
 
   e = chain->length - 1;
   while (source_e < chain->length) {
-#define have_imin (e > 0 && e < chain->length && chain->effects[e - 1]->oend - chain->effects[e - 1]->obeg >= chain->effects[e]->imin)
+#define have_imin ( \
+   e > 0 \
+   && e < chain->length \
+   && chain->effects[e - 1]->oend - chain->effects[e - 1]->obeg \
+      >= chain->effects[e]->imin \
+ )
     size_t osize = chain->effects[e]->oend - chain->effects[e]->obeg;
+
     if (e == source_e && (draining || !have_imin)) {
       if (drain_effect(chain, e) == SOX_EOF) {
         ++source_e;
         draining = sox_false;
       }
-    } else if (have_imin && flow_effect(chain, e) == SOX_EOF) {
+    }
+    else if (have_imin && flow_effect(chain, e) == SOX_EOF) {
       flow_status = SOX_EOF;
       if (e == chain->length - 1)
         break;
       source_e = e;
       draining = sox_true;
     }
-    if (e < chain->length && chain->effects[e]->oend - chain->effects[e]->obeg > osize) /* False for output */
+    if (
+      e < chain->length
+      && chain->effects[e]->oend - chain->effects[e]->obeg > osize
+    )
+      /* False for output */
       ++e;
     else if (e == source_e)
       draining = sox_true;
@@ -462,25 +497,41 @@ int sox_flow_effects(sox_effects_chain_t * chain, int (* callback)(sox_bool all_
     else
       --e;
 
-    if (callback && callback(source_e == chain->length, client_data) != SOX_SUCCESS) {
-      flow_status = SOX_EOF; /* Client has requested to stop the flow. */
+    if (
+      callback
+      && callback(source_e == chain->length, client_data) != SOX_SUCCESS
+    ) {
+      /* Client has requested to stop the flow. */
+      flow_status = SOX_EOF;
       break;
     }
   }
 
   /* If an effect's output buffer still has samples, and if it is
-     uninterleaved, then re-interleave it. Necessary since it might
-     be reused, and at that time possibly followed by an MCHAN effect. */
+   * uninterleaved, then re-interleave it. Necessary since it might
+   * be reused, and at that time possibly followed by an MCHAN effect.
+   */
   for (e = 0; e + 1 < chain->length; e++) {
     sox_effect_t *effp = chain->effects[e];
-    if (effp->oend > effp->obeg && chain->effects[e+1]->flows > 1) {
-      sox_sample_t *sw = chain->il_buf; chain->il_buf = effp->obuf; effp->obuf = sw;
-      interleave(chain->effects[e+1]->flows, effp->oend - effp->obeg,
-          chain->il_buf, sox_globals.bufsiz, effp->obeg, effp->obuf);
+
+    if (effp->oend > effp->obeg && chain->effects[e + 1]->flows > 1) {
+      sox_sample_t *sw = chain->il_buf;
+
+      chain->il_buf = effp->obuf;
+      effp->obuf = sw;
+      interleave(
+        chain->effects[e + 1]->flows,
+        effp->oend - effp->obeg,
+        chain->il_buf,
+        sox_globals.bufsiz,
+        effp->obeg,
+        effp->obuf
+      );
     }
   }
 
   free(chain->il_buf);
+  soxdbg_fleave();
   return flow_status;
 }
 
