@@ -17,7 +17,7 @@
 #ifdef SOXDBG_ALLOWED
 #  define soxdbg_fenter() fprintf(stderr, "Entering %s\n", __func__)
 #  define soxdbg_fleave() fprintf(stderr, "Leaving %s\n", __func__)
-#  define soxdbg_exit(c) fprintf(stderr, "Exiting %s with %d\n", __func__, d)
+#  define soxdbg_exit(c) fprintf(stderr, "Exiting %s with %d\n", __func__, c)
 #  define soxdbg_show_var(fmt, name) fprintf(stderr, \
      "[In <%s> at %s:%d]: %s = " fmt "\n", \
      __FILE__, __func__, __LINE__, #name, name \
