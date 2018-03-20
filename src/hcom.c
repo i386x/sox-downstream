@@ -288,16 +288,32 @@ static size_t write_samples(sox_format_t * ft, const sox_sample_t *buf, size_t l
   return len;
 }
 
-static void makecodes(int e, int c, int s, int b, dictent newdict[511], long codes[256], long codesize[256])
+static void makecodes(
+  int e, int c, int s, int b,
+  dictent newdict[511], long codes[256], long codesize[256]
+)
 {
-  assert(b);                    /* Prevent stack overflow */
+  soxdbg_fprintf(
+    stderr,
+    "Entering makecodes(%d, %d, %d, %d, ...)\n", e, c, s, b
+  );
+  /* Prevent stack overflow */
+  assert(b);
   if (newdict[e].dict_leftson < 0) {
     codes[newdict[e].dict_rightson] = c;
     codesize[newdict[e].dict_rightson] = s;
   } else {
-    makecodes(newdict[e].dict_leftson, c, s + 1, b << 1, newdict, codes, codesize);
-    makecodes(newdict[e].dict_rightson, c + b, s + 1, b << 1, newdict, codes, codesize);
+    makecodes(
+      newdict[e].dict_leftson, c, s + 1, b << 1, newdict, codes, codesize
+    );
+    makecodes(
+      newdict[e].dict_rightson, c + b, s + 1, b << 1, newdict, codes, codesize
+    );
   }
+  soxdbg_fprintf(
+    stderr,
+    "Leaving makecodes(%d, %d, %d, %d, ...)\n", e, c, s, b
+  );
 }
 
 static void putcode(sox_format_t * ft, long codes[256], long codesize[256], unsigned c, unsigned char **df)
@@ -394,7 +410,9 @@ static void compress(sox_format_t *ft, unsigned char **df, int32_t *dl)
   dictsize = p->de - newdict;
   soxdbg_fprintf(stderr, "newdict:\n");
   soxdbg_show_hcom_dict(newdict);
+  soxdbg_fprintf(stderr "=== start(makecodes) ===\n");
   makecodes(0, 0, 0, 1, newdict, codes, codesize);
+  soxdbg_fprintf(stderr "=== end(makecodes) ===\n");
   l = 0;
   for (i = 0; i < 256; i++)
     l += frequtable[i] * codesize[i];
