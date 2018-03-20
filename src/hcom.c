@@ -323,9 +323,9 @@ static void putcode(sox_format_t * ft, long codes[256], long codesize[256], unsi
   }
 }
 
-static void compress(sox_format_t * ft, unsigned char **df, int32_t *dl)
+static void compress(sox_format_t *ft, unsigned char **df, int32_t *dl)
 {
-  priv_t *p = (priv_t *) ft->priv;
+  priv_t *p = (priv_t *)ft->priv;
   int samplerate;
   unsigned char *datafork = *df;
   unsigned char *ddf, *dfp;
@@ -335,6 +335,8 @@ static void compress(sox_format_t * ft, unsigned char **df, int32_t *dl)
   dictent newdict[511];
   int i, sample, j, k, d, l, frequcount;
 
+  soxdbg_fenter();
+
   sample = *datafork;
   memset(frequtable, 0, sizeof(frequtable));
   memset(codes, 0, sizeof(codes));
@@ -342,10 +344,12 @@ static void compress(sox_format_t * ft, unsigned char **df, int32_t *dl)
   memset(newdict, 0, sizeof(newdict));
 
   for (i = 1; i < *dl; i++) {
-    d = (datafork[i] - (sample & 0xff)) & 0xff; /* creates absolute entries LMS */
+    /* creates absolute entries LMS */
+    d = (datafork[i] - (sample & 0xff)) & 0xff;
     sample = datafork[i];
     datafork[i] = d;
-    assert(d >= 0 && d <= 255); /* check our table is accessed correctly */
+    /* check our table is accessed correctly */
+    assert(d >= 0 && d <= 255);
     frequtable[d]++;
   }
   p->de = newdict;
@@ -388,6 +392,8 @@ static void compress(sox_format_t * ft, unsigned char **df, int32_t *dl)
     frequcount--;
   }
   dictsize = p->de - newdict;
+  soxdbg_fprintf(stderr, "newdict:\n");
+  soxdbg_show_hcom_dict(newdict);
   makecodes(0, 0, 0, 1, newdict, codes, codesize);
   l = 0;
   for (i = 0; i < 256; i++)
@@ -421,8 +427,11 @@ static void compress(sox_format_t * ft, unsigned char **df, int32_t *dl)
   samplerate = 22050 / ft->signal.rate + .5;
   put32_be(&dfp, samplerate);
   put16_be(&dfp, dictsize);
-  *df = datafork;               /* reassign passed pointer to new datafork */
-  *dl = l;                      /* and its compressed length */
+  /* reassign passed pointer to new datafork */
+  *df = datafork;
+  /* and its compressed length */
+  *dl = l;
+  soxdbg_fleave();
 }
 
 /* End of hcom utility routines */
