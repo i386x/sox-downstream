@@ -490,7 +490,7 @@ static int stopwrite(sox_format_t *ft)
     rc = SOX_EOF;
   }
   else if (
-    lsx_writebuf(ft, compressed_data, compressed_len) != compressed_len
+    lsx_writebuf(ft, compressed_data, (size_t)compressed_len) != (size_t)compressed_len
   ) {
     /* Write the compressed_data fork */
     lsx_fail_errno(ft, errno, "can't write compressed HCOM data");
