@@ -462,7 +462,7 @@ static int stopwrite(sox_format_t *ft)
 {
   priv_t *p = (priv_t *)ft->priv;
   unsigned char *compressed_data = p->data;
-  int32_t compressed_len = (int_32_t)p->pos;
+  int32_t compressed_len = (int32_t)p->pos;
   int rc = SOX_SUCCESS;
 
   soxdbg_fenter();
