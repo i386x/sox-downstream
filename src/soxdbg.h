@@ -370,28 +370,28 @@
    soxdbg_fprintf(stderr, "[[[/SHOWING INFO ABOUT FORMAT_T]]]\n"); \
  } while(0)
 
-#define soxdbg_show_hcom_priv(p) do {
-   soxdbg_fprintf(stderr, "[[[SHOWING HCOM PRIVATE DATA]]]\n");
-   soxdbg_fprintf(stderr, "- dictionary:\n");
-   soxdbg_show_hcom_dict((p).dictionary);
-   soxdbg_fprintf(stderr, "- checksum: %" PRId32 "\n", (p).checksum);
-   soxdbg_fprintf(stderr, "- deltacompression: %d\n", (p).deltacompression);
-   soxdbg_fprintf(stderr, "- huffcount: %ld\n", (p).huffcount);
-   soxdbg_fprintf(stderr, "- cksum: %ld\n", (p).cksum);
-   soxdbg_fprintf(stderr, "- dictentry: %d\n", (p).dictentry);
-   soxdbg_fprintf(stderr, "- nrbits: %d\n", (p).nrbits);
-   soxdbg_fprintf(stderr, "- current: %" PRIu32 "\n", (p).current);
-   soxdbg_fprintf(stderr, "- sample: %d\n", (int)((p).sample));
-   soxdbg_fprintf(stderr, "- de:\n");
-   soxdbg_show_hcom_dict((p).de);
-   soxdbg_fprintf(stderr, "- new_checksum: %" PRId32 "\n", (p).new_checksum);
-   soxdbg_fprintf(stderr, "- nbits: %d\n", (p).nbits);
-   soxdbg_fprintf(stderr, "- curword: %" PRId32 "\n", (p).curword);
-   soxdbg_fprintf(stderr, "- data:\n");
-   soxdbg_show_hcom_data(p);
-   soxdbg_fprintf(stderr, "- size: %zu\n", (p).size);
-   soxdbg_fprintf(stderr, "- pos: %zu\n", (p).pos);
-   soxdbg_fprintf(stderr, "[[[/SHOWING HCOM PRIVATE DATA]]]\n");
+#define soxdbg_show_hcom_priv(p) do { \
+   soxdbg_fprintf(stderr, "[[[SHOWING HCOM PRIVATE DATA]]]\n"); \
+   soxdbg_fprintf(stderr, "- dictionary:\n"); \
+   soxdbg_show_hcom_dict((p).dictionary); \
+   soxdbg_fprintf(stderr, "- checksum: %" PRId32 "\n", (p).checksum); \
+   soxdbg_fprintf(stderr, "- deltacompression: %d\n", (p).deltacompression); \
+   soxdbg_fprintf(stderr, "- huffcount: %ld\n", (p).huffcount); \
+   soxdbg_fprintf(stderr, "- cksum: %ld\n", (p).cksum); \
+   soxdbg_fprintf(stderr, "- dictentry: %d\n", (p).dictentry); \
+   soxdbg_fprintf(stderr, "- nrbits: %d\n", (p).nrbits); \
+   soxdbg_fprintf(stderr, "- current: %" PRIu32 "\n", (p).current); \
+   soxdbg_fprintf(stderr, "- sample: %d\n", (int)((p).sample)); \
+   soxdbg_fprintf(stderr, "- de:\n"); \
+   soxdbg_show_hcom_dict((p).de); \
+   soxdbg_fprintf(stderr, "- new_checksum: %" PRId32 "\n", (p).new_checksum); \
+   soxdbg_fprintf(stderr, "- nbits: %d\n", (p).nbits); \
+   soxdbg_fprintf(stderr, "- curword: %" PRId32 "\n", (p).curword); \
+   soxdbg_fprintf(stderr, "- data:\n"); \
+   soxdbg_show_hcom_data(p); \
+   soxdbg_fprintf(stderr, "- size: %zu\n", (p).size); \
+   soxdbg_fprintf(stderr, "- pos: %zu\n", (p).pos); \
+   soxdbg_fprintf(stderr, "[[[/SHOWING HCOM PRIVATE DATA]]]\n"); \
  } while (0)
 
 #endif
