@@ -359,6 +359,7 @@ static void compress(sox_format_t *ft, unsigned char **df, int32_t *dl)
   memset(codesize, 0, sizeof(codesize));
   memset(newdict, 0, sizeof(newdict));
 
+  soxdbg_fprintf(stderr, "==> *dl: %" PRId32 "\n", *dl);
   for (i = 1; i < *dl; i++) {
     /* creates absolute entries LMS */
     d = (datafork[i] - (sample & 0xff)) & 0xff;
@@ -368,6 +369,8 @@ static void compress(sox_format_t *ft, unsigned char **df, int32_t *dl)
     assert(d >= 0 && d <= 255);
     frequtable[d]++;
   }
+  soxdbg_fprintf(stderr, "==> frequtable:\n");
+  soxdbg_show_hcom_frequtable(frequtable);
   p->de = newdict;
   for (i = 0; i < 256; i++)
     if (frequtable[i] != 0) {
@@ -377,6 +380,7 @@ static void compress(sox_format_t *ft, unsigned char **df, int32_t *dl)
       p->de++;
     }
   frequcount = p->de - newdict;
+  soxdbg_fprintf(stderr, "==> frequcount: %d\n", frequcount);
   for (i = 0; i < frequcount; i++) {
     for (j = i + 1; j < frequcount; j++) {
       if (newdict[i].frequ > newdict[j].frequ) {

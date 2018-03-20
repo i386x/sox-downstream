@@ -238,6 +238,12 @@
        } \
      } \
    } while (0)
+#  define soxdbg_show_hcom_frequtable(t) do { \
+     int i = 0; \
+ \
+     for (i = 0; i < 256; i++) \
+       soxdbg_fprintf(stderr, "[FREQ %d]: %d\n", i, t[i]); \
+   } while (0)
 #else
 #  define soxdbg_fprintf(f, ...) soxdbg_noop()
 #  define soxdbg_fenter() soxdbg_noop()
@@ -256,6 +262,7 @@
 #  define soxdbg_show_write_rates(r) soxdbg_noop()
 #  define soxdbg_show_hcom_dict(d) soxdbg_noop()
 #  define soxdbg_show_hcom_data(p) soxdbg_noop()
+#  define soxdbg_show_hcom_frequtable(t) soxdbg_noop()
 #endif
 
 #define soxdbg_show_char(name) soxdbg_show_cvar(name)
