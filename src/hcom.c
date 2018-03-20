@@ -436,6 +436,7 @@ static int stopwrite(sox_format_t *ft)
 
   soxdbg_fenter();
   soxdbg_show_format_t(*ft);
+  soxdbg_show_hcom_priv(*((priv_t *)ft->priv));
 
   /* Compress it all at once */
   if (compressed_len)

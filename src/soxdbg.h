@@ -201,6 +201,43 @@
      } \
      fprintf(stderr, "\n"); \
    } while (0)
+#  define soxdbg_show_hcom_dict(d) do { \
+     dictent *p = (d); \
+     int i = 0; \
+ \
+     if (p == NULL) \
+       fprintf(stderr, "  NULL\n"); \
+     else \
+       for (i = 0; i < 511; i++) \
+         fprintf( \
+           stderr, \
+           "  [DI #%d]: %ld\t%d\t%d\n", \
+           i, p[i].frequ, (int)(p[i].dict_leftson), (int)(p[i].dict_rightson) \
+         ); \
+   } while (0)
+#  define soxdbg_show_hcom_data(p) do { \
+     unsigned char *data = (p).data; \
+     size_t size = (p).size; \
+     size_t i = 0; \
+ \
+     if (data == NULL) \
+       fprintf(stderr, "  NULL\n"); \
+     else if (size == 0) \
+       fprintf(stderr, "  no data\n"); \
+     else { \
+       fprintf( \
+         stderr, \
+         "  XXXXXXXX: 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n" \
+       ); \
+       for (i = 0; i < size; i++) { \
+         if ((i & 15) == 0) \
+           fprintf(stderr, "  %08zX:", i); \
+         fprintf(stderr, " %02X", (unsigned int)data[i]); \
+         if (i == size - 1 || (i & 15) == 15) \
+           fprintf(stderr, "\n"); \
+       } \
+     } \
+   } while (0)
 #else
 #  define soxdbg_fprintf(f, ...) soxdbg_noop()
 #  define soxdbg_fenter() soxdbg_noop()
@@ -217,6 +254,8 @@
 #  define soxdbg_show_format_handler_names(x) soxdbg_noop()
 #  define soxdbg_show_write_formats(f) soxdbg_noop()
 #  define soxdbg_show_write_rates(r) soxdbg_noop()
+#  define soxdbg_show_hcom_dict(d) soxdbg_noop()
+#  define soxdbg_show_hcom_data(p) soxdbg_noop()
 #endif
 
 #define soxdbg_show_char(name) soxdbg_show_cvar(name)
@@ -330,5 +369,29 @@
    soxdbg_fprintf(stderr, "- priv: %p\n", (x).priv); \
    soxdbg_fprintf(stderr, "[[[/SHOWING INFO ABOUT FORMAT_T]]]\n"); \
  } while(0)
+
+#define soxdbg_show_hcom_priv(p) do {
+   soxdbg_fprintf(stderr, "[[[SHOWING HCOM PRIVATE DATA]]]\n");
+   soxdbg_fprintf(stderr, "- dictionary:\n");
+   soxdbg_show_hcom_dict((p).dictionary);
+   soxdbg_fprintf(stderr, "- checksum: %" PRId32 "\n", (p).checksum);
+   soxdbg_fprintf(stderr, "- deltacompression: %d\n", (p).deltacompression);
+   soxdbg_fprintf(stderr, "- huffcount: %ld\n", (p).huffcount);
+   soxdbg_fprintf(stderr, "- cksum: %ld\n", (p).cksum);
+   soxdbg_fprintf(stderr, "- dictentry: %d\n", (p).dictentry);
+   soxdbg_fprintf(stderr, "- nrbits: %d\n", (p).nrbits);
+   soxdbg_fprintf(stderr, "- current: %" PRIu32 "\n", (p).current);
+   soxdbg_fprintf(stderr, "- sample: %d\n", (int)((p).sample));
+   soxdbg_fprintf(stderr, "- de:\n");
+   soxdbg_show_hcom_dict((p).de);
+   soxdbg_fprintf(stderr, "- new_checksum: %" PRId32 "\n", (p).new_checksum);
+   soxdbg_fprintf(stderr, "- nbits: %d\n", (p).nbits);
+   soxdbg_fprintf(stderr, "- curword: %" PRId32 "\n", (p).curword);
+   soxdbg_fprintf(stderr, "- data:\n");
+   soxdbg_show_hcom_data(p);
+   soxdbg_fprintf(stderr, "- size: %zu\n", (p).size);
+   soxdbg_fprintf(stderr, "- pos: %zu\n", (p).pos);
+   soxdbg_fprintf(stderr, "[[[/SHOWING HCOM PRIVATE DATA]]]\n");
+ } while (0)
 
 #endif
