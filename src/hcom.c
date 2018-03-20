@@ -410,9 +410,9 @@ static void compress(sox_format_t *ft, unsigned char **df, int32_t *dl)
   dictsize = p->de - newdict;
   soxdbg_fprintf(stderr, "newdict:\n");
   soxdbg_show_hcom_dict(newdict);
-  soxdbg_fprintf(stderr "=== start(makecodes) ===\n");
+  soxdbg_fprintf(stderr, "=== start(makecodes) ===\n");
   makecodes(0, 0, 0, 1, newdict, codes, codesize);
-  soxdbg_fprintf(stderr "=== end(makecodes) ===\n");
+  soxdbg_fprintf(stderr, "=== end(makecodes) ===\n");
   l = 0;
   for (i = 0; i < 256; i++)
     l += frequtable[i] * codesize[i];
