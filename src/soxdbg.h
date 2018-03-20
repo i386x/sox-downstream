@@ -217,7 +217,7 @@
    } while (0)
 #  define soxdbg_show_hcom_data(p) do { \
      unsigned char *data = (p).data; \
-     size_t size = (p).size; \
+     size_t size = (p).pos; \
      size_t i = 0; \
  \
      if (data == NULL) \
