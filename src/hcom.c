@@ -462,7 +462,7 @@ static int stopwrite(sox_format_t *ft)
 {
   priv_t *p = (priv_t *)ft->priv;
   unsigned char *compressed_data = p->data;
-  size_t compressed_len = p->pos;
+  int32_t compressed_len = (int_32_t)p->pos;
   int rc = SOX_SUCCESS;
 
   soxdbg_fenter();
@@ -471,7 +471,7 @@ static int stopwrite(sox_format_t *ft)
 
   /* Compress it all at once */
   if (compressed_len)
-    compress(ft, &compressed_data, (int32_t *)&compressed_len);
+    compress(ft, &compressed_data, &compressed_len);
   free(p->data);
 
   /* Write the header */
@@ -500,7 +500,7 @@ static int stopwrite(sox_format_t *ft)
 
   if (rc == SOX_SUCCESS)
     /* Pad the compressed_data fork to a multiple of 128 bytes */
-    lsx_padbytes(ft, 128u - (compressed_len % 128));
+    lsx_padbytes(ft, (size_t)128 - (compressed_len % 128));
 
   soxdbg_fleave();
   return rc;
